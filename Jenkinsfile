@@ -39,7 +39,7 @@ stage('Create Scratch Org') {
 
     println('Satrted creation..')
     // need to pull out assigned username
-    rc = bat returnStatus: true, script: "${toolbelt}/sfdx force:org:create --definitionfile config/workspace-scratch-def.json --json --setdefaultusername"
+    rc = bat returnStatus: true, script: "${toolbelt}/sfdx force:org:create --targetdevhubusername HubOrg --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ciorg --wait 10 --durationdays 1"
     println rmsg
     // def jsonSlurper = new JsonSlurperClassic()
     // def robj = jsonSlurper.parseText(rmsg)
