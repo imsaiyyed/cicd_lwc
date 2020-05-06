@@ -41,8 +41,11 @@ node {
                 println rc 
 
                 // need to pull out assigned username
-                rmsg = sh returnStdout: true, script: "${toolbelt}/sfdx force:org:create --definitionfile config/project-scratch-def.json --json --setdefaultusername --setalias ciorg --durationdays 1"
-                printf rmsg
+                rc = command "${toolbelt}/sfdx force:org:create --definitionfile config/project-scratch-def.json --json --setdefaultusername --setalias ciorg --durationdays 1"
+                printf rc
+                 if (rc != 0) {
+                    error 'Salesforce test scratch org creation failed.'
+                }
             }
 
    
