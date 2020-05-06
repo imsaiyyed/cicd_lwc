@@ -39,9 +39,20 @@ node {
                     error 'Salesforce dev hub org authorization failed.'
                 }
                 println rc
+
+                // need to pull out assigned username
+    rmsg = sh returnStdout: true, script: "${toolbelt}/sfdx force:org:create --definitionfile config/workspace-scratch-def.json --json --setdefaultusername"
+    printf rmsg
+    def jsonSlurper = new JsonSlurperClassic()
+    def robj = jsonSlurper.parseText(rmsg)
+    if (robj.status != "ok") { error 'org creation failed: ' + robj.message }
+    SFDC_USERNAME=robj.username
+    robj = null
             }
 
+   
 
+/*
             // -------------------------------------------------------------------------
             // Create new scratch org to test your code.
             // -------------------------------------------------------------------------
@@ -76,7 +87,7 @@ node {
                     error 'Salesforce push to test scratch org failed.'
                 }
             }
-/*
+
 
             // -------------------------------------------------------------------------
             // Run unit tests in test scratch org.
