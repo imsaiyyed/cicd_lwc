@@ -29,24 +29,44 @@ node {
     withEnv(["HOME=${env.WORKSPACE}"]) {
         
         withCredentials([file(credentialsId: SERVER_KEY_CREDENTALS_ID, variable: 'server_key_file')]) {
+
+
+
+stage('Create Scratch Org') {
+
+    rc = sh returnStatus: true, script: "${toolbelt}/sfdx force:auth:jwt:grant --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setdefaultdevhubusername --instanceurl ${SF_INSTANCE_URL}"
+    if (rc != 0) { error 'hub org authorization failed' }
+
+    println('Satrted creation..')
+    // need to pull out assigned username
+    rmsg = sh returnStdout: true, script: "${toolbelt}/sfdx force:org:create --definitionfile config/workspace-scratch-def.json --json --setdefaultusername"
+    println rmsg
+    def jsonSlurper = new JsonSlurperClassic()
+    def robj = jsonSlurper.parseText(rmsg)
+    if (robj.status != "ok") { error 'org creation failed: ' + robj.message }
+    SFDC_USERNAME=robj.username
+    robj = null
+
+}
+
             // -------------------------------------------------------------------------
             // Authorize the Dev Hub org with JWT key and give it an alias.
             // -------------------------------------------------------------------------
 
-            stage('Authorize DevHub') {
-                rc = command "${toolbelt}/sfdx force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setdefaultdevhubusername --setalias HubOrg"
-                if (rc != 0) {
-                    error 'Salesforce dev hub org authorization failed.'
-                }
-                println rc 
+            // stage('Authorize DevHub') {
+            //     rc = command "${toolbelt}/sfdx force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setdefaultdevhubusername --setalias HubOrg"
+            //     if (rc != 0) {
+            //         error 'Salesforce dev hub org authorization failed.'
+            //     }
+            //     println rc 
 
-                // need to pull out assigned username
-                rc = command "${toolbelt}/sfdx force:org:create --targetdevhubusername HubOrg --definitionfile config/project-scratch-def.json --json --setdefaultusername --setalias ciorg --durationdays 1"
-                println rc
-                 if (rc != 0) {
-                    error 'Salesforce test scratch org creation failed.'
-                }
-            }
+            //     // need to pull out assigned username
+            //     rc = command "${toolbelt}/sfdx force:org:create --targetdevhubusername HubOrg --definitionfile config/project-scratch-def.json --json --setdefaultusername --setalias ciorg --durationdays 1"
+            //     println rc
+            //      if (rc != 0) {
+            //         error 'Salesforce test scratch org creation failed.'
+            //     }
+            // }
 
    
 
