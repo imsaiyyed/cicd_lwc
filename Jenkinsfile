@@ -34,12 +34,12 @@ node {
 
 stage('Create Scratch Org') {
 
-    rc = command "${toolbelt}/sfdx force:auth:jwt:grant --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setdefaultdevhubusername --instanceurl ${SF_INSTANCE_URL}"
+    rc = bat returnStatus: true, script: "${toolbelt}/sfdx force:auth:jwt:grant --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setdefaultdevhubusername --instanceurl ${SF_INSTANCE_URL}"
     if (rc != 0) { error 'hub org authorization failed' }
 
     println('Satrted creation..')
     // need to pull out assigned username
-    rc = command "${toolbelt}/sfdx force:org:create --definitionfile config/workspace-scratch-def.json --json --setdefaultusername"
+    rc = bat returnStatus: true, script: "${toolbelt}/sfdx force:org:create --definitionfile config/workspace-scratch-def.json --json --setdefaultusername"
     println rmsg
     // def jsonSlurper = new JsonSlurperClassic()
     // def robj = jsonSlurper.parseText(rmsg)
