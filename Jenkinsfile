@@ -54,7 +54,7 @@ node {
             // -------------------------------------------------------------------------
 
             stage('Authorize DevHub') {
-                rc = command "${toolbelt}/sfdx force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setdefaultdevhubusername --setalias my-hub-org"
+                rc = command "${toolbelt}/sfdx force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile \"${server_key_file}\" --setdefaultdevhubusername --setalias DevHub"
                 if (rc != 0) {
                     error 'Salesforce dev hub org authorization failed.'
                 }
@@ -69,7 +69,7 @@ node {
             // -------------------------------------------------------------------------
 
             stage('Create Test Scratch Org') {
-                rc = command "${toolbelt}/sfdx force:org:create --targetdevhubusername my-hub-org --setdefaultusername --definitionfile config/project-scratch-def.json --setalias my-hub-org --wait 10 --durationdays 1"
+                rc = command "${toolbelt}/sfdx force:org:create --targetdevhubusername DevHub --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ci_org --wait 10 --durationdays 1"
                 if (rc != 0) {
                     error 'Salesforce test scratch org creation failed.'
                 }
@@ -79,7 +79,7 @@ node {
             // -------------------------------------------------------------------------
             // Display test scratch org info.
             // -------------------------------------------------------------------------
-
+/*
             stage('Display Test Scratch Org') {
                 rc = command "${toolbelt}/sfdx force:org:display --targetusername my-hub-org"
                 if (rc != 0) {
@@ -112,7 +112,7 @@ node {
                 println rc
             }
 
-/*
+
             // -------------------------------------------------------------------------
             // Delete test scratch org.
             // -------------------------------------------------------------------------
